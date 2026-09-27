@@ -1,7 +1,7 @@
 name: Sync Speckle Images to Aliyun ACR
 
 on:
-  workflow_dispatch: # 支持手动点击一键运行
+  workflow_dispatch:
 
 jobs:
   sync-images:
@@ -16,17 +16,22 @@ jobs:
 
       - name: Pull, Tag and Push Images
         run: |
-          # 1. MinIO 存储服务
-          docker pull minio/minio:RELEASE.2023-09-07T02-05-02Z
-          docker tag minio/minio:RELEASE.2023-09-07T02-05-02Z crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
-          docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
+          set -e
 
-          # 2. Speckle 服务端核心
+          # 1. 拉取并同步 Speckle 服务端核心
+          echo "Syncing Speckle Server..."
           docker pull speckle/speckle-server:2
           docker tag speckle/speckle-server:2 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:server
           docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:server
 
-          # 3. Speckle 前端 UI
+          # 2. 拉取并同步 Speckle 前端 UI
+          echo "Syncing Speckle Frontend..."
           docker pull speckle/speckle-frontend-2:2
           docker tag speckle/speckle-frontend-2:2 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:frontend
           docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:frontend
+
+          # 3. 使用无限制的公开 MinIO 镜像作为 S3 底座
+          echo "Syncing MinIO..."
+          docker pull bitnami/minio:2023.9.7
+          docker tag bitnami/minio:2023.9.7 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
+          docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
