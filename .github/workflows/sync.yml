@@ -1,0 +1,32 @@
+name: Sync Speckle Images to Aliyun ACR
+
+on:
+  workflow_dispatch: # 支持手动点击一键运行
+
+jobs:
+  sync-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Aliyun ACR
+        uses: docker/login-action@v3
+        with:
+          registry: crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Pull, Tag and Push Images
+        run: |
+          # 1. MinIO 存储服务
+          docker pull minio/minio:RELEASE.2023-09-07T02-05-02Z
+          docker tag minio/minio:RELEASE.2023-09-07T02-05-02Z crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
+          docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
+
+          # 2. Speckle 服务端核心
+          docker pull speckle/speckle-server:2
+          docker tag speckle/speckle-server:2 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:server
+          docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:server
+
+          # 3. Speckle 前端 UI
+          docker pull speckle/speckle-frontend-2:2
+          docker tag speckle/speckle-frontend-2:2 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:frontend
+          docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:frontend
