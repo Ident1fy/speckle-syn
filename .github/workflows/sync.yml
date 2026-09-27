@@ -14,26 +14,10 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and Push MinIO Image
+      - name: Pull and Push MinIO via GHCR
         run: |
           set -e
-          echo "Downloading official MinIO from GitHub Releases..."
-          curl -fSL https://github.com/minio/minio/releases/download/RELEASE.2023-09-07T02-05-02Z/minio.RELEASE.2023-09-07T02-05-02Z -o minio
-          chmod +x minio
-
-          echo "Creating Dockerfile..."
-          cat << 'EOF' > Dockerfile.minio
-          FROM alpine:3.18
-          RUN apk add --no-cache ca-certificates libc6-compat
-          COPY minio /usr/bin/minio
-          EXPOSE 9000 9001
-          ENTRYPOINT ["minio"]
-          VOLUME ["/data"]
-          CMD ["server", "/data", "--console-address", ":9001"]
-          EOF
-
-          echo "Building MinIO image locally..."
-          docker build -f Dockerfile.minio -t crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio .
-
-          echo "Pushing MinIO image to ACR..."
+          echo "Pulling official MinIO from GitHub Container Registry (ghcr.io)..."
+          docker pull ghcr.io/minio/minio:latest
+          docker tag ghcr.io/minio/minio:latest crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
           docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
