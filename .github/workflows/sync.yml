@@ -17,8 +17,8 @@ jobs:
       - name: Build and Push MinIO Image
         run: |
           set -e
-          echo "Downloading official MinIO from dl.min.io direct CDN..."
-          curl -fSL https://dl.min.io/server/minio/release/linux-amd64/minio -o minio
+          echo "Downloading official MinIO from GitHub Releases..."
+          curl -fSL https://github.com/minio/minio/releases/download/RELEASE.2023-09-07T02-05-02Z/minio.RELEASE.2023-09-07T02-05-02Z -o minio
           chmod +x minio
 
           echo "Creating Dockerfile..."
