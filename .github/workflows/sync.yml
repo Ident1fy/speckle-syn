@@ -32,6 +32,6 @@ jobs:
 
           # 3. 使用无限制的公开 MinIO 镜像作为 S3 底座
           echo "Syncing MinIO..."
-          docker pull bitnami/minio:2023.9.7
-          docker tag bitnami/minio:2023.9.7 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
+          docker pull bitnami/minio:RELEASE.2024-01-18T22-51-28Z
+          docker tag bitnami/minio:RELEASE.2024-01-18T22-51-28Z crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
           docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
