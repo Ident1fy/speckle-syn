@@ -14,10 +14,26 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Pull Quay MinIO and Push to ACR
+      - name: Build and Push MinIO Image
         run: |
           set -e
-          echo "Pulling official MinIO from Quay.io..."
-          docker pull quay.io/minio/minio:RELEASE.2023-09-07T02-05-02Z
-          docker tag quay.io/minio/minio:RELEASE.2023-09-07T02-05-02Z crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
+          echo "Downloading official MinIO binary..."
+          wget -q https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2023-09-07T02-05-02Z -O minio
+          chmod +x minio
+
+          echo "Creating Dockerfile..."
+          cat << 'EOF' > Dockerfile.minio
+          FROM alpine:3.18
+          RUN apk add --no-cache ca-certificates libc6-compat curl
+          COPY minio /usr/bin/minio
+          EXPOSE 9000 9001
+          ENTRYPOINT ["minio"]
+          VOLUME ["/data"]
+          CMD ["server", "/data", "--console-address", ":9001"]
+          EOF
+
+          echo "Building MinIO image locally..."
+          docker build -f Dockerfile.minio -t crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio .
+
+          echo "Pushing MinIO image to ACR..."
           docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
