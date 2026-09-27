@@ -14,24 +14,10 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Pull, Tag and Push Images
+      - name: Pull, Tag and Push MinIO
         run: |
           set -e
-
-          # 1. 拉取并同步 Speckle 服务端核心
-          echo "Syncing Speckle Server..."
-          docker pull speckle/speckle-server:2
-          docker tag speckle/speckle-server:2 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:server
-          docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:server
-
-          # 2. 拉取并同步 Speckle 前端 UI
-          echo "Syncing Speckle Frontend..."
-          docker pull speckle/speckle-frontend-2:2
-          docker tag speckle/speckle-frontend-2:2 crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:frontend
-          docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:frontend
-
-          # 3. 使用无限制的公开 MinIO 镜像作为 S3 底座
-          echo "Syncing MinIO... latest"
-          docker pull bitnami/minio:latest
-          docker tag bitnami/minio:latest crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
+          echo "Pulling official MinIO latest..."
+          docker pull minio/minio:latest
+          docker tag minio/minio:latest crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
           docker push crpi-fpvz13dxk5z4gdp8.cn-hangzhou.personal.cr.aliyuncs.com/speckle-server/speckle-server:minio
