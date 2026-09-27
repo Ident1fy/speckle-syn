@@ -17,14 +17,14 @@ jobs:
       - name: Build and Push MinIO Image
         run: |
           set -e
-          echo "Downloading official MinIO binary..."
-          wget -q https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2023-09-07T02-05-02Z -O minio
+          echo "Downloading official MinIO from dl.min.io direct CDN..."
+          curl -fSL https://dl.min.io/server/minio/release/linux-amd64/minio -o minio
           chmod +x minio
 
           echo "Creating Dockerfile..."
           cat << 'EOF' > Dockerfile.minio
           FROM alpine:3.18
-          RUN apk add --no-cache ca-certificates libc6-compat curl
+          RUN apk add --no-cache ca-certificates libc6-compat
           COPY minio /usr/bin/minio
           EXPOSE 9000 9001
           ENTRYPOINT ["minio"]
